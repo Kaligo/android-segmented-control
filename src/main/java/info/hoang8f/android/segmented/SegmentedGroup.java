@@ -11,6 +11,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.StateSet;
 import android.util.TypedValue;
@@ -265,13 +266,37 @@ public class SegmentedGroup extends RadioGroup {
             children = newChildren;
             child = newChild;
 
+            // is Left-To-Right language
+            final boolean isLTR;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                 isLTR = (TextUtils.getLayoutDirectionFromLocale(getContext().getResources().getConfiguration().locale) == LAYOUT_DIRECTION_LTR);
+            }
+            else {
+                isLTR = true;
+            }
             // if there is only one child provide the default radio button
             if (children == 1) {
                 radii = rDefault;
             } else if (child == 0) { //left or top
-                radii = (getOrientation() == LinearLayout.HORIZONTAL) ? rLeft : rTop;
+                if(getOrientation() == LinearLayout.HORIZONTAL) {
+                    if(isLTR)
+                        radii = rLeft;
+                    else
+                        radii = rRight;
+                }
+                else {
+                    radii = rTop;
+                }
             } else if (child == children - 1) {  //right or bottom
-                radii = (getOrientation() == LinearLayout.HORIZONTAL) ? rRight : rBot;
+                if(getOrientation() == LinearLayout.HORIZONTAL) {
+                    if(isLTR)
+                        radii = rRight;
+                    else
+                        radii = rLeft;
+                }
+                else {
+                    radii = rBot;
+                }
             } else {  //middle
                 radii = rMiddle;
             }
